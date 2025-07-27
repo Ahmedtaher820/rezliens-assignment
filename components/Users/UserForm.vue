@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
+import { ref, watch, computed, PropType } from "vue";
 import {
   Dialog,
   DialogContent,
@@ -17,12 +17,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
+import { User } from "@/interfaces/auth";
 /***************************************
  **** Section Props Declaration  ******
  **************************************/
 //#region Props
 const props = defineProps({
-  editUser: Object,
+  editUser: Object as PropType<User>,
 });
 
 //#endregion
@@ -41,6 +42,7 @@ const emit = defineEmits(["close"]);
 //#region Variables
 
 const { users } = storeToRefs(useUserStore());
+const isOpen = defineModel("isOpen", { default: false });
 const form = ref({
   id: null,
   fullName: "",
@@ -56,6 +58,9 @@ const form = ref({
  **************************************/
 //#region Computed
 const isEdit = computed(() => !!props.editUser);
+const currentEditUserIsAdmin = computed(
+  () => props.editUser?.role === "admin" && isEdit.value
+);
 //#endregion
 
 /***************************************
@@ -114,10 +119,15 @@ function handleSubmit() {
 </script>
 
 <template>
-  <Dialog open @close="emit('close')">
+  <Dialog v-model:open="isOpen" @close="emit('close')">
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>{{ isEdit ? "Edit User" : "Add User" }}</DialogTitle>
+        <DialogTitle>
+          <span>{{ isEdit ? `Update User ${form.fullName}` : "Add User" }}</span>
+          <span class="text-red-600 text-sm" v-if="currentEditUserIsAdmin">
+            ({{ currentEditUserIsAdmin ? "You can't update admin role" : "" }})
+          </span>
+        </DialogTitle>
       </DialogHeader>
 
       <form @submit.prevent="handleSubmit" class="space-y-2">
@@ -127,6 +137,7 @@ function handleSubmit() {
             v-model="form.fullName"
             placeholder="enter full name"
             required
+            :disabled="currentEditUserIsAdmin"
           />
         </div>
         <div class="flex flex-col gap-1">
@@ -136,12 +147,17 @@ function handleSubmit() {
             type="email"
             placeholder="enter Email"
             required
+            :disabled="currentEditUserIsAdmin"
           />
         </div>
         <div class="grid grid-cols-12 gap-4">
           <div class="flex-1 col-span-6">
             <label for="">Role</label>
-            <Select v-model="form.role" class="w-full">
+            <Select
+              v-model="form.role"
+              :disabled="currentEditUserIsAdmin"
+              class="w-full"
+            >
               <SelectTrigger class="w-full">
                 <SelectValue placeholder="Role" />
               </SelectTrigger>
@@ -153,7 +169,11 @@ function handleSubmit() {
           </div>
           <div class="col-span-6">
             <label for="">User Status</label>
-            <Select v-model="form.status" class="w-full role-select">
+            <Select
+              v-model="form.status"
+              :disabled="currentEditUserIsAdmin"
+              class="w-full role-select"
+            >
               <SelectTrigger class="w-full">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -166,17 +186,15 @@ function handleSubmit() {
         </div>
 
         <div class="flex justify-end gap-2 mt-8">
-          <Button type="button" variant="outline" @click="emit('close')"
-            >Cancel</Button
-          >
-          <Button type="submit">{{ isEdit ? "Update" : "Create" }}</Button>
+          <Button type="button" variant="outline" @click="emit('close')">Cancel</Button>
+          <Button type="submit" :disabled="currentEditUserIsAdmin">{{isEdit ? "Update" : "Create"}}</Button>
         </div>
       </form>
     </DialogContent>
   </Dialog>
 </template>
 <style>
-.role-select button{
-    width: 100%;
+.role-select button {
+  width: 100%;
 }
 </style>

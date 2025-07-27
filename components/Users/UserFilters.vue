@@ -1,14 +1,15 @@
-  
-  <script setup lang="ts">
-  import { useUsers } from '@/composables/useUsers'
-  import { Input } from '@/components/ui/input'
-  import {
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
-  } from '@/components/ui/select'
+<script setup lang="ts">
+import { useUsers } from "@/composables/useUsers";
+import { useUserStore } from "@/stores/auth";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { storeToRefs } from "pinia";
 /***************************************
  **** Section Props Declaration  ******
  **************************************/
@@ -24,7 +25,8 @@
 /***************************************
  **** Section Variables Declaration ****
  **************************************/
- const { search, roleFilter, statusFilter, clearFilters } = useUsers()
+const { clearFilters } = useUsers();
+const { roleFilter, statusFilter, search } = storeToRefs(useUserStore());
 //#region Variables
 //#endregion
 
@@ -52,38 +54,34 @@
  **************************************/
 //#region Functions
 
-
 //#endregion
-  
-  </script>
+</script>
 
 <template>
-    <div class="flex flex-wrap gap-4">
-      <Input
-        v-model="search"
-        placeholder="Search by name or email"
-        class="w-full sm:w-64"
-      />
-      <Select v-model="roleFilter">
-        <SelectTrigger class="w-40">
-          <SelectValue placeholder="Filter by Role" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="admin">Admin</SelectItem>
-          <SelectItem value="client">Client</SelectItem>
-        </SelectContent>
-      </Select>
-      <Select v-model="statusFilter">
-        
-        <SelectTrigger class="w-40">
-          <SelectValue placeholder="Filter by Status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="active">Active</SelectItem>
-          <SelectItem value="inactive">Inactive</SelectItem>
-        </SelectContent>
-      </Select>
-      <Button class="" @click="clearFilters" >Clear Filter</Button>
-
-    </div>
-  </template>
+  <div class="flex flex-wrap gap-4">
+    <Input
+      v-model="search"
+      placeholder="Search by name or email"
+      class="w-full sm:w-64"
+    />
+    <Select v-model="roleFilter">
+      <SelectTrigger class="w-40">
+        <SelectValue placeholder="Filter by Role" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="admin">Admin</SelectItem>
+        <SelectItem value="client">Client</SelectItem>
+      </SelectContent>
+    </Select>
+    <Select v-model="statusFilter">
+      <SelectTrigger class="w-40">
+        <SelectValue placeholder="Filter by Status" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="active">Active</SelectItem>
+        <SelectItem value="inactive">Inactive</SelectItem>
+      </SelectContent>
+    </Select>
+    <Button class="" @click="clearFilters">Clear Filter</Button>
+  </div>
+</template>

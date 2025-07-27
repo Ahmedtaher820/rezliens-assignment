@@ -1,46 +1,37 @@
 import { ref, computed, watch } from "vue";
 import { usePagination } from "@/composables/usePagination";
 import { useUserStore } from "@/stores/auth";
-
-import type { User } from "@/interfaces/auth";
 import { storeToRefs } from "pinia";
+import type { User } from "@/interfaces/auth";
+import type { ComputedRef } from "vue";
+
 export function useUsers() {
   /***************************************
    **** Section Variables Declaration ****
    **************************************/
   //#region Variables
   const { currentPage, itemsPerPage } = usePagination();
-  const { users } = storeToRefs(useUserStore());
-  const search = ref("");
-  const roleFilter = ref("");
-  const statusFilter = ref("");
-  const sortBy = ref<"name" | "date">("date");
-  const sortDir = ref<"asc" | "desc">("desc");
+  const { users, sortBy,sortDir,roleFilter,statusFilter,search } = storeToRefs(useUserStore());
+  
   //#endregion
 
   /***************************************
    **** Section Computed Variables  ******
    **************************************/
   //#region Computed
-  const filteredUsers = computed(() => {
-    console.log(
-      "Computing filtered users",
-      search.value,
-      roleFilter.value,
-      statusFilter.value
-    );
+  const filteredUsers: ComputedRef<User[]> = computed(() => {
     return users.value.filter((u) => {
       return (
         (search.value === "" ||
-          u.fullName.toLowerCase().includes(search.value.toLowerCase()) ||
-          u.email.toLowerCase().includes(search.value.toLowerCase())) &&
+          u.fullName.toLowerCase().includes(search.value.toLowerCase().trim()) ||
+          u.email.toLowerCase().includes(search.value.toLowerCase().trim())) &&
         (roleFilter.value === "" || u.role === roleFilter.value) &&
         (statusFilter.value === "" || u.status === statusFilter.value)
       );
     });
   });
 
-  const paginatedUsers = computed(() => {
+  const paginatedUsers: ComputedRef<User[]> = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage.value;
     const end = start + itemsPerPage.value;
 
@@ -55,7 +46,6 @@ export function useUsers() {
   watch(
     [search, roleFilter, statusFilter],
     ([newSearch, newRole, newStatus]) => {
-      console.log("Filters changed:", newSearch, newRole, newStatus);
       currentPage.value = 1;
     }
   );
@@ -84,7 +74,7 @@ export function useUsers() {
       `Are you sure you want to delete ${user.fullName}?`
     );
     if (confirmed) {
-      const index = users.value.findIndex((u) => u.id === user.id);
+      const index: number = users.value.findIndex((u) => u.id === user.id);
       if (index !== -1) {
         users.value.splice(index, 1);
       }

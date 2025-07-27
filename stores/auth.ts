@@ -1,7 +1,9 @@
-import { defineStore } from "pinia";
-import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 import { ref, computed } from "vue";
+import { } from "vue-router";
+import { defineStore } from "pinia";
 import type { User } from "@/interfaces/auth";
+import type { ComputedRef } from "vue";
+
 export const useUserStore = defineStore(
   "userStore",
   () => {
@@ -100,21 +102,29 @@ export const useUserStore = defineStore(
       status: "",
       createdAt: "",
     });
+
+    const search = ref<string>("");
+    const roleFilter = ref<string>("");
+    const statusFilter = ref<string>("");
+    const sortBy = ref<"name" | "date">("date");
+    const sortDir = ref<"asc" | "desc">("desc");
     //#endregion
 
     /***************************************
      **** Section Computed Getters ******
      **************************************/
     //#region Getters
-    const getLoggedUser = computed(() => currentUser.value);
-    const isAdmin = computed(() => currentUser.value.role === "admin");
+    const getLoggedUser: ComputedRef<User> = computed(() => currentUser.value);
+    const isAdmin: ComputedRef<Boolean> = computed(
+      () => currentUser.value.role === "admin"
+    );
     //#endregion
 
     /***************************************
      **** Section Functions Declaration (Actions) ****
      **************************************/
     //#region Actions
-    function logout(): void{
+    function logout(): void {
       currentUser.value = {
         id: 0,
         fullName: "",
@@ -123,7 +133,7 @@ export const useUserStore = defineStore(
         status: "",
         createdAt: "",
       };
-      navigateTo('/login');
+      navigateTo("/login");
     }
     //#endregion
     return {
@@ -131,13 +141,18 @@ export const useUserStore = defineStore(
       currentUser,
       getLoggedUser,
       logout,
-      isAdmin
+      isAdmin,
+      search,
+      roleFilter,
+      statusFilter,
+      sortBy,
+      sortDir,
     };
   },
   {
     persist: {
-      storage: typeof window !== 'undefined' ? localStorage : undefined,
-      pick: ['currentUser', 'users'],
+      storage: typeof window !== "undefined" ? localStorage : undefined,
+      pick: ["currentUser", "users"],
     },
   }
 );

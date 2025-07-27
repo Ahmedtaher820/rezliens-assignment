@@ -21,7 +21,7 @@ export const useReportStore = defineStore(
         id: 102,
         title: "UI glitch on dashboard",
         type: "bug",
-        status: "open",
+        status: "completed",
         createdAt: "2025-07-03",
         description: "Dashboard widgets overlap on smaller screens.",
       },
@@ -29,7 +29,7 @@ export const useReportStore = defineStore(
         id: 103,
         title: "Add dark mode",
         type: "feature",
-        status: "in-progress",
+        status: "pending",
         createdAt: "2025-07-04",
         description: "Implement dark mode toggle for better accessibility.",
       },
@@ -37,7 +37,7 @@ export const useReportStore = defineStore(
         id: 104,
         title: "Payment gateway timeout",
         type: "bug",
-        status: "resolved",
+        status: "rejected",
         createdAt: "2025-07-06",
         description: "Transactions fail intermittently due to timeout errors.",
       },
@@ -53,11 +53,14 @@ export const useReportStore = defineStore(
         id: 106,
         title: "Broken link in footer",
         type: "bug",
-        status: "open",
+        status: "completed",
         createdAt: "2025-07-08",
         description: "The 'Privacy Policy' link leads to a 404 page.",
       },
     ]);
+    const search = ref<string>("");
+    const typeFilter = ref<string>("all");
+    const statusFilter = ref<string>("all");
     //#endregion
 
     /***************************************
@@ -73,7 +76,10 @@ export const useReportStore = defineStore(
 
     //#endregion
     return {
-      reports
+      reports,
+      search,
+      typeFilter,
+      statusFilter
     };
   },
   {

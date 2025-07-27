@@ -2,32 +2,34 @@ import { ref, computed, watch } from "vue";
 import { usePagination } from "@/composables/usePagination";
 import { useReportStore } from "@/stores/reports";
 import { storeToRefs } from "pinia";
+import type { Report } from "@/interfaces/reports";
+import type { ComputedRef } from "vue";
 export function useReports() {
   /***************************************
    **** Section Variables Declaration ****
    **************************************/
   //#region Variables
   const { currentPage, itemsPerPage } = usePagination();
-  const { reports } = storeToRefs(useReportStore());
-  const search = ref("");
-  const typeFilter = ref("");
-  const statusFilter = ref("");
+  const { reports, search, statusFilter, typeFilter } = storeToRefs(
+    useReportStore()
+  );
+  
   //#endregion
 
   /***************************************
    **** Section Computed Variables  ******
    **************************************/
   //#region Computed
-  const filteredReports = computed(() => {
+  const filteredReports: ComputedRef<Report[]> = computed(() => {
     return reports.value.filter((u) => {
       return (
-        (typeFilter.value === "" || u.type === typeFilter.value) &&
-        (statusFilter.value === "" || u.status === statusFilter.value)
+        (typeFilter.value === "all" || u.type === typeFilter.value) &&
+        (statusFilter.value === "all" || u.status === statusFilter.value)
       );
     });
   });
 
-  const paginatedReports = computed(() => {
+  const paginatedReports: ComputedRef<Report[]> = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage.value;
     const end = start + itemsPerPage.value;
 
@@ -42,7 +44,6 @@ export function useReports() {
   watch(
     [search, typeFilter, statusFilter],
     ([newSearch, newRole, newStatus]) => {
-      console.log("Filters changed:", newSearch, newRole, newStatus);
       currentPage.value = 1;
     }
   );

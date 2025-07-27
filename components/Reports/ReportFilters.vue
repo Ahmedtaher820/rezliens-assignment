@@ -1,6 +1,7 @@
   
   <script setup lang="ts">
-  import { useUsers } from '@/composables/useUsers'
+  import { useReports } from '@/composables/useReports'
+  import {useReportStore} from "@/stores/reports"
   import { Input } from '@/components/ui/input'
   import {
     Select,
@@ -9,6 +10,7 @@
     SelectContent,
     SelectItem,
   } from '@/components/ui/select'
+import { storeToRefs } from 'pinia'
 /***************************************
  **** Section Props Declaration  ******
  **************************************/
@@ -24,7 +26,8 @@
 /***************************************
  **** Section Variables Declaration ****
  **************************************/
- const { search, roleFilter, statusFilter, clearFilters } = useUsers()
+ const {  clearFilters } = useReports()
+ const {search , statusFilter,typeFilter} = storeToRefs(useReportStore())
 //#region Variables
 //#endregion
 
@@ -64,13 +67,14 @@
         placeholder="Search by name or email"
         class="w-full sm:w-64"
       />
-      <Select v-model="roleFilter">
+      <Select v-model="typeFilter">
         <SelectTrigger class="w-40">
-          <SelectValue placeholder="Filter by Role" />
+          <SelectValue placeholder="Filter by Type" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="admin">Admin</SelectItem>
-          <SelectItem value="client">Client</SelectItem>
+          <SelectItem value="all">All</SelectItem>
+          <SelectItem value="bug">Bug</SelectItem>
+          <SelectItem value="feature">Feature</SelectItem>
         </SelectContent>
       </Select>
       <Select v-model="statusFilter">
@@ -79,8 +83,10 @@
           <SelectValue placeholder="Filter by Status" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="active">Active</SelectItem>
-          <SelectItem value="inactive">Inactive</SelectItem>
+          <SelectItem value="all">All</SelectItem>
+          <SelectItem value="pending">Pending</SelectItem>
+          <SelectItem value="completed">Completed</SelectItem>
+          <SelectItem value="rejected">Rejected</SelectItem>
         </SelectContent>
       </Select>
       <Button class="" @click="clearFilters" >Clear Filter</Button>

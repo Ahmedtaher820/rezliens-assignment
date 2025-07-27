@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import {ref} from "vue"
+import type { Report } from '@/interfaces/reports'
+
 /***************************************
  **** Section Props Declaration  ******
  **************************************/
@@ -17,7 +19,7 @@ import {ref} from "vue"
  **************************************/
 const isAdmin = true
 const showModal = ref(false)
-const editingUser = ref(null)
+const reportData = ref<Report>(null)
 
 //#region Variables
 //#endregion
@@ -45,17 +47,13 @@ const editingUser = ref(null)
  **** Section Functions Declaration ****
  **************************************/
 //#region Functions
-function openAddModal() {
-    editingUser.value = null
-    showModal.value = true
-}
+
 
 function closeModal() {
     showModal.value = false
 }
-
-function editUser(user: any) {
-    editingUser.value = user
+function displayReport(report: Report) {
+    reportData.value = report
     showModal.value = true
 }
 //#endregion
@@ -64,11 +62,10 @@ function editUser(user: any) {
 <template>
     <div>
         <div class="flex justify-between items-center mb-6">
-            <UsersUserFilters />
-            <Button v-if="isAdmin" @click="openAddModal">+ Add User</Button>
+            <ReportsReportFilters />
         </div>
-        <UsersUserTable @editUser="editUser" />
-        <UsersUserForm v-model:isOpen="showModal" :editUser="editingUser" @close="closeModal" />
+        <ReportsReportTable @displayReport="displayReport" />
+        <ReportsReportView v-model:isOpen="showModal" :reportData="reportData" @close="closeModal" />
     </div>
 </template>
 <style></style>
